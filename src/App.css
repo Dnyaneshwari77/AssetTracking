@@ -1,0 +1,49 @@
+*
+{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+
+body
+{
+  margin: 0;
+  padding: 0;
+  background-color: #ECEBE9;
+}
+
+.upperstrip
+{
+  height: 150px;
+  background-color: #470651;
+}
+
+.heddingContainer
+{
+  color: white;
+  padding: 10px;
+}
+
+.pageTitle
+{
+  margin-bottom:5px !important;
+}
+
+.formContainer
+{
+
+z-index: 99;
+background-color:#ECEBE9 ;
+border-radius: 4px;
+}
+
+.box-shadow
+{
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+}
+.leaflet-container
+{
+  z-index: 10;
+}
