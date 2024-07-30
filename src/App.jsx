@@ -1,6 +1,8 @@
 // src/App.jsx
 import React from "react";
-import { ThemeProvider, CssBaseline, Container } from "@mui/material";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import { Container } from "@mui/material";
 import theme from "./theme";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";

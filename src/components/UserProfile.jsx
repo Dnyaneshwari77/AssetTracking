@@ -17,6 +17,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { Cancel } from "@mui/icons-material";
+import { BASE_URL } from "../utils/constant";
 
 const Input = styled("input")({
   display: "none",
@@ -44,7 +45,7 @@ const fetchUserProfile = async () => {
 const updateUserProfile = async (userData) => {
   try {
     const response = await axios.patch(
-      "http://192.168.150.208:3000/auth/update/profile",
+      `${BASE_URL}/auth/update/profile`,
       userData,
       {
         headers: {

@@ -23,6 +23,8 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import AuthContext from "../context/AuthContext";
 import toast from "react-hot-toast";
 
+import { BASE_URL } from "../utils/constant";
+
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [page, setPage] = useState(0);
@@ -50,24 +52,24 @@ export default function EmployeeList() {
     }
   }, [page, rowsPerPage, deviceId]);
 
-  const fetchEmployees = (page, limit) => {
-    axios
-      .get(
-        `http://192.168.27.208:3000/admin/agentlist?page=${page}&limit=${limit}`,
+  const fetchEmployees = async (page, limit) => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/admin/agentlist/?page=${page}&limit=${limit}`,
         {
           headers: {
             deviceid: deviceId,
             authorization: `Token ${user.token}`,
+            "ngrok-skip-browser-warning": "69420",
           },
         }
-      )
-      .then((response) => {
-        setEmployees(response.data.Agents);
-        setTotalPages(response.data.totalPages);
-      })
-      .catch((error) => {
-        toast.error("There was an error fetching the data!", error);
-      });
+      );
+      console.log(response.data);
+      setEmployees(response.data.Agents);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      toast.error("There was an error fetching the data!");
+    }
   };
 
   const handleDelete = (id) => {
@@ -200,44 +202,48 @@ export default function EmployeeList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {employees.map((employee) => (
-                <motion.tr
-                  key={employee._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <TableCell>{employee.username}</TableCell>
-                  <TableCell>{employee.employeeID}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.firstName}</TableCell>
-                  <TableCell>{employee.lastName}</TableCell>
-                  <TableCell
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-evenly",
-                      gap: "5px",
-                      flexWrap: "wrap",
-                      alignItems: "center",
-                    }}
+              {employees ? (
+                employees.map((employee) => (
+                  <motion.tr
+                    key={employee._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                   >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleUpdate(employee)}
+                    <TableCell>{employee.username}</TableCell>
+                    <TableCell>{employee.employeeID}</TableCell>
+                    <TableCell>{employee.email}</TableCell>
+                    <TableCell>{employee.firstName}</TableCell>
+                    <TableCell>{employee.lastName}</TableCell>
+                    <TableCell
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-evenly",
+                        gap: "5px",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                      }}
                     >
-                      Update
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleDelete(employee._id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </motion.tr>
-              ))}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleUpdate(employee)}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleDelete(employee._id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </motion.tr>
+                ))
+              ) : (
+                <pre>No Employee found</pre>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

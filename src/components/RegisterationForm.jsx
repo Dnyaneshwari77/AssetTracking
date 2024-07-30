@@ -18,6 +18,7 @@ import {
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import AuthContext from "../context/AuthContext";
 import { ColorRing } from "react-loader-spinner";
+import { BASE_URL } from "../utils/constant";
 const theme = createTheme({
   palette: {
     primary: {
@@ -63,16 +64,13 @@ const RegistrationForm = () => {
     setLoading(true);
     console.log("Form Data here ..", formData);
     try {
-      const response = await fetch(
-        "http://192.168.150.208:3000/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         toast.error('Registration failed"');

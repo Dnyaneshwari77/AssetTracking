@@ -13,6 +13,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import { BASE_URL } from "../utils/constant";
 
 // Validation Schema using Yup
 const validationSchema = Yup.object({
@@ -32,7 +33,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const { setLoading, login } = useContext(AuthContext);
+  const { setLoading, login, deviceId, user } = useContext(AuthContext);
 
   const formik = useFormik({
     initialValues: {
@@ -41,16 +42,18 @@ const ResetPassword = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      console.log(user);
+      const token = localStorage.getItem("token");
+      console.log(token);
       setLoading(true);
       axios
         .put(
-          "http://192.168.150.208:3000/auth/update/resetPassword",
+          `${BASE_URL}/auth/update/resetPassword`,
           { password: values.password },
           {
             headers: {
-              Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OThhMTBjM2Y4MWNkNDY1ZTU2ZWEwNSIsInVzZXJuYW1lIjoiQWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImRldmljZUlkIjoiNDBiODYxNTM5ZWRlODg2Yzg1MDYzZWY3OWFlMmU1ZjEiLCJpYXQiOjE3MjE3OTczMTEsImV4cCI6MTcyMjQwMjExMX0.XBTUyQY8ehI6SJnyWHxq8xWgP2whFZ4WyV9uetW52G4",
-              deviceId: "40b861539ede886c85063ef79ae2e5f1",
+              Authorization: `Token ${token}`,
+              deviceId: deviceId,
             },
           }
         )

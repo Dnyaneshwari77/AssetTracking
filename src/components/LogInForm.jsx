@@ -13,8 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import AuthContext from "../context/AuthContext";
+import { BASE_URL } from "../utils/constant";
 
 const theme = createTheme({
   palette: {
@@ -27,20 +27,10 @@ const theme = createTheme({
 const LogInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [deviceId, setDeviceId] = useState("");
 
   const navigate = useNavigate();
-  const { login, setLoading, loading, role, setRole, user } =
+  const { login, setLoading, loading, role, setRole, user, deviceId } =
     useContext(AuthContext);
-
-  useEffect(() => {
-    const loadFingerprintJS = async () => {
-      const fp = await FingerprintJS.load();
-      const result = await fp.get();
-      setDeviceId(result.visitorId);
-    };
-    loadFingerprintJS();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,10 +39,11 @@ const LogInForm = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://192.168.150.208:3000/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420",
         },
         body: JSON.stringify({ email, password, deviceId }),
       });
@@ -75,6 +66,12 @@ const LogInForm = () => {
       if (data.role) {
         setRole(role);
       }
+
+      localStorage.setItem("assets_sub_types", data.assets_sub_types);
+      localStorage.setItem("assets_sub_types", data.assets_sub_types);
+      localStorage.setItem("assets_types", data.assets_types);
+      localStorage.setItem("department_names", data.department_name);
+      localStorage.setItem("owners_names", data.owners_name);
 
       if (data.password_reset == false) {
         navigate("/reset/password/");

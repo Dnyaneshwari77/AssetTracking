@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import NavBar from "../components/NavBar";
 import MapComponent from "../components/MapComponent";
-import SurveyForm from "../components/SurveyForm";
+import SurveyForm from "../components/SurveyFormNew";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -23,6 +23,7 @@ export default function HomePage() {
         flexDirection="column"
         alignContent="center"
         justifyContent="center"
+        marginTop={"100px"}
       >
         <Box
           display="flex"
@@ -42,6 +43,8 @@ export default function HomePage() {
             m={1} // Margin for spacing
           >
             <SurveyForm />
+
+            {/* <SurveyFormNew /> */}
           </Box>
           <Box
             flex={2} // Allows the map to grow more than the form

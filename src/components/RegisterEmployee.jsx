@@ -18,6 +18,7 @@ import {
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import AuthContext from "../context/AuthContext";
 import { ColorRing } from "react-loader-spinner";
+import { BASE_URL } from "../utils/constant";
 const theme = createTheme({
   palette: {
     primary: {
@@ -64,11 +65,12 @@ const RegisterEmployee = () => {
     console.log("Form Data here ..", formData);
     try {
       const response = await fetch(
-        "http://192.168.150.208:3000/auth/register",
+        `${BASE_URL}/auth/register`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "69420",
           },
           body: JSON.stringify(formData),
         }

@@ -6,9 +6,11 @@ import {
   Typography,
   TextareaAutosize,
 } from "@mui/material";
+import Box from "@mui/material/Box";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
+import { BASE_URL } from "../utils/constant";
 
 export default function SurveyForm() {
   const {
@@ -58,15 +60,15 @@ export default function SurveyForm() {
     });
 
     const token = localStorage.getItem("token");
-    // const deviceId = "40b861539ede886c85063ef79ae2e5f1";
 
     try {
-      const response = await fetch("http://192.168.150.208:3000/submit/", {
+      const response = await fetch(`${BASE_URL}/submit/`, {
         method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
           deviceId: deviceId,
+          "ngrok-skip-browser-warning": "69420",
         },
       });
 

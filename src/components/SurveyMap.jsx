@@ -13,6 +13,7 @@ import MarkerClusterGroup from "@changey/react-leaflet-markercluster";
 import SurveyMarker from "./SurveyMarker";
 import { EditControl } from "react-leaflet-draw";
 import SurveyList from "./SurveyList";
+import { BASE_URL } from "../utils/constant";
 
 // Define icon options
 const createCustomIcon = (color) => {
@@ -34,11 +35,12 @@ const SurveyMap = () => {
   const { user } = useContext(AuthContext);
 
   const fetchSurveyData = async () => {
-    const response = await fetch("http://192.168.150.208:3000/admin/survey/", {
+    const response = await fetch(`${BASE_URL}/admin/survey/`, {
       method: "GET",
       headers: {
         deviceid: deviceId,
         authorization: `Token ${user.token}`,
+        "ngrok-skip-browser-warning": "69420",
       },
     });
     const data = await response.json();
@@ -69,12 +71,13 @@ const SurveyMap = () => {
 
   const fetchSurveysWithinRegion = (layers) => {
     console.log("Request co ordinates", layers);
-    fetch("http://192.168.150.208:3000/admin/survey/region/", {
+    fetch(`${BASE_URL}/admin/survey/region/`, {
       method: "POST",
       headers: {
         deviceid: "40b861539ede886c85063ef79ae2e5f1",
         authorization: `Token ${user.token}`,
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "69420",
       },
       body: JSON.stringify({ polygons: layers }),
     })
@@ -88,54 +91,6 @@ const SurveyMap = () => {
       });
   };
 
-  // const _onCreated = async (e) => {
-  //   console.log(e);
-  //   console.log("DeviceID", deviceId);
-
-  //   const { layerType, layer } = e;
-  //   if (layerType === "polygon" || layerType === "rectangle") {
-  //     const { _leaflet_id } = layer;
-
-  //     // Get the latLngs for the polygon
-  //     const latlngs = layer.getLatLngs();
-
-  //     // Convert latlngs to the format [lng, lat]
-  //     const convertedLatLngs = latlngs[0].map((coord) => [
-  //       coord.lng,
-  //       coord.lat,
-  //     ]);
-
-  //     // Create a new map layer with the updated latlngs
-  //     const newLayer = { id: _leaflet_id, latlngs: [convertedLatLngs] };
-
-  //     // Update the state with the new layer, preserving previous layers
-  //     setMapLayers((prevLayers) => {
-  //       const updatedLayers = [...prevLayers, newLayer];
-
-  //       console.log("Updated map layers:", updatedLayers);
-
-  //       // Perform the API call with the updated layers
-  //       fetch("http://192.168.150.208:3000/admin/survey/region/", {
-  //         method: "POST",
-  //         headers: {
-  //           deviceid: "40b861539ede886c85063ef79ae2e5f1",
-  //           authorization: `Token ${user.token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ polygons: updatedLayers }),
-  //       })
-  //         .then((response) => response.json())
-  //         .then((data) => {
-  //           console.log("Surveys within polygon:", data.surveys);
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error fetching surveys within polygon:", error);
-  //         });
-
-  //       return updatedLayers;
-  //     });
-  //   }
-  // };
   const _onCreated = (e) => {
     console.log(e);
     console.log("DeviceID", deviceId);
@@ -169,22 +124,6 @@ const SurveyMap = () => {
       });
     }
   };
-
-  // const _onEdited = (e) => {
-  //   const editedLayers = [];
-  //   e.layers.eachLayer((layer) => {
-  //     const { _leaflet_id, _latlngs } = layer;
-  //     editedLayers.push({ id: _leaflet_id, latlngs: _latlngs });
-  //   });
-
-  //   setMapLayers((layers) =>
-  //     layers.map(
-  //       (layer) =>
-  //         editedLayers.find((editedLayer) => editedLayer.id === layer.id) ||
-  //         layer
-  //     )
-  //   );
-  // };
 
   const _onEdited = (e) => {
     const editedLayers = [];

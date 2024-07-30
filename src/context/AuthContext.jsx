@@ -1,13 +1,13 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [deviceId, setDeviceId] = useState();
   const [role, setRole] = useState("");
   const [location, setLocation] = useState({
     coordinates: [],
@@ -61,9 +61,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const createDeviceID = async () => {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    setDeviceId(result.visitorId);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
+    createDeviceID();
     setRole(role);
     setUser(token);
     setLoading(false);
@@ -94,6 +101,7 @@ export const AuthProvider = ({ children }) => {
         surveyDescription,
         files,
         role,
+        deviceId,
         setFiles,
         setSurveyDescription,
         login,
