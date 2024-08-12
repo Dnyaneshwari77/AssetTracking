@@ -30,21 +30,11 @@ export default function EmployeeList() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
-  const [deviceId, setDeviceId] = useState("");
-  const { user } = useContext(AuthContext);
+  // const [deviceId, setDeviceId] = useState("");
+  const { user, deviceId } = useContext(AuthContext);
 
   const [open, setOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(null);
-
-  useEffect(() => {
-    const loadFingerprintJS = async () => {
-      const fp = await FingerprintJS.load();
-      const result = await fp.get();
-      setDeviceId(result.visitorId);
-    };
-
-    loadFingerprintJS();
-  }, []);
 
   useEffect(() => {
     if (deviceId) {
@@ -54,6 +44,9 @@ export default function EmployeeList() {
 
   const fetchEmployees = async (page, limit) => {
     try {
+      console.log("DevbiceId from auth ", deviceId);
+
+      console.log("Token from auth", user.token);
       const response = await axios.get(
         `${BASE_URL}/admin/agentlist/?page=${page}&limit=${limit}`,
         {
@@ -76,10 +69,11 @@ export default function EmployeeList() {
     const token = localStorage.getItem("token");
 
     axios
-      .delete(`http://192.168.104.208:3000/admin/${id}`, {
+      .delete(`${BASE_URL}/admin/${id}`, {
         headers: {
           deviceid: deviceId,
           authorization: `Token ${user.token}`,
+          "ngrok-skip-browser-warning": "69420",
         },
       })
       .then(() => {
@@ -106,16 +100,13 @@ export default function EmployeeList() {
     const token = localStorage.getItem("token");
 
     axios
-      .patch(
-        `http://192.168.104.208:3000/admin/${currentEmployee._id}`,
-        currentEmployee,
-        {
-          headers: {
-            deviceid: deviceId,
-            authorization: `Token ${user.token}`,
-          },
-        }
-      )
+      .patch(`${BASE_URL}/admin/${currentEmployee._id}`, currentEmployee, {
+        headers: {
+          deviceid: deviceId,
+          authorization: `Token ${user.token}`,
+          "ngrok-skip-browser-warning": "69420",
+        },
+      })
       .then(() => {
         toast.success("Employee data updated sucessfully");
         fetchEmployees(page + 1, rowsPerPage);

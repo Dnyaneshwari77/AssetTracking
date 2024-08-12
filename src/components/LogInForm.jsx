@@ -25,6 +25,7 @@ const theme = createTheme({
 });
 
 const LogInForm = () => {
+  // Removed async here
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -32,10 +33,56 @@ const LogInForm = () => {
   const { login, setLoading, loading, role, setRole, user, deviceId } =
     useContext(AuthContext);
 
+  const getOS = () => {
+    const userAgent = window.navigator.userAgent;
+    if (userAgent.includes("Windows")) return "Windows";
+    if (userAgent.includes("Mac")) return "macOS";
+    if (userAgent.includes("Linux")) return "Linux";
+    return "Unknown";
+  };
+
+  const getLocation = async () => {
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          resolve("Unknown");
+        }
+      );
+    });
+  };
+
+  const getDeviceType = () => {
+    const width = window.innerWidth;
+    if (width <= 768) {
+      return "smartphone";
+    } else if (width <= 1200) {
+      return "tablet";
+    } else {
+      return "laptop/desktop";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log("Device ID", deviceId);
+
+    const location = await getLocation(); // Moved inside handleSubmit
+
+    let deviceDetails = {
+      device: getDeviceType(),
+      location: location,
+      model: "Unknown Model",
+      time: new Date().toISOString(),
+      imei: "unique number", // Replace with actual unique ID
+      os: getOS(),
+    };
 
     try {
       setLoading(true);
@@ -45,7 +92,12 @@ const LogInForm = () => {
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "69420",
         },
-        body: JSON.stringify({ email, password, deviceId }),
+        body: JSON.stringify({
+          email,
+          password,
+          deviceId,
+          deviceDetails,
+        }),
       });
 
       if (!response.ok) {
@@ -63,25 +115,30 @@ const LogInForm = () => {
         setEmail("");
         setPassword("");
       }
+
       if (data.role) {
-        setRole(role);
+        setRole(data.role); // Use the role from the API response
       }
 
-      localStorage.setItem("assets_sub_types", data.assets_sub_types);
-      localStorage.setItem("assets_sub_types", data.assets_sub_types);
-      localStorage.setItem("assets_types", data.assets_types);
-      localStorage.setItem("department_names", data.department_name);
-      localStorage.setItem("owners_names", data.owners_name);
-
-      if (data.password_reset == false) {
+      localStorage.setItem("owners_names", JSON.stringify(data.owners_name));
+      localStorage.setItem(
+        "department_names",
+        JSON.stringify(data.department_name)
+      );
+      localStorage.setItem(
+        "assets_sub_types",
+        JSON.stringify(data.assets_sub_types)
+      );
+      localStorage.setItem("assets_types", JSON.stringify(data.assets_types));
+      localStorage.setItem("regions", JSON.stringify(data.regions));
+  
+      
+      if (data.password_reset === false) {
         navigate("/reset/password/");
       } else {
         setLoading(false);
         login(data.token, data.role);
-
-        navigate("/");
-
-        if (data.role == "admin") {
+        if (data.role === "admin") {
           navigate("/admin");
         } else {
           navigate("/");

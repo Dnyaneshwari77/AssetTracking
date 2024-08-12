@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import NavBar from "../components/NavBar";
 import MapComponent from "../components/MapComponent";
-import SurveyForm from "../components/SurveyFormNew";
+import SurveyForm from "../components/SurveyFormNewOne";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 

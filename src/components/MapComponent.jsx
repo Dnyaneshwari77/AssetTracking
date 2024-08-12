@@ -28,7 +28,9 @@ const LocateUser = ({ setLoading, setLocationData }) => {
         coordinates: [longitude, latitude],
         altitude: altitude || 0,
         speed: speed || 0,
-        time: new Date(timestamp).toISOString(),
+        time: timestamp
+          ? new Date(timestamp).toString()
+          : new Date().toString(),
       };
 
       const radius = e.accuracy / 2;

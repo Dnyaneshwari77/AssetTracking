@@ -61,12 +61,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const createDeviceID = async () => {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    setDeviceId(result.visitorId);
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
@@ -75,6 +69,12 @@ export const AuthProvider = ({ children }) => {
     setUser(token);
     setLoading(false);
   }, []);
+
+  const createDeviceID = async () => {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    setDeviceId(result.visitorId);
+  };
 
   const login = (token, role) => {
     setUser({ token });
@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setRole("");
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     setLoading(false);
   };
 

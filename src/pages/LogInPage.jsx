@@ -76,6 +76,8 @@ export default function LogInPage() {
   useEffect(() => {
     if (user && role == "employee") {
       navigate("/");
+    } else if (user && role == "admin") {
+      navigate("/admin");
     }
   }, [user, role]);
   return (

@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import "@changey/react-leaflet-markercluster/dist/styles.min.css";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
+
 import AuthContext from "../context/AuthContext";
 import toast from "react-hot-toast";
 import MarkerClusterGroup from "@changey/react-leaflet-markercluster";
@@ -26,13 +26,18 @@ const createCustomIcon = (color) => {
 };
 
 // Main component
-const SurveyMap = () => {
+const SurveyMap = ({
+  fillterSurvey,
+  setFillterSurvey,
+  filterData,
+  setNewFillterSurvey,
+}) => {
   const [surveys, setSurveys] = useState([]);
-  const [fillterSurvey, setFillterSurvey] = useState([]);
-  const [deviceId, setDeviceId] = useState("");
+
+  // const [deviceId, setDeviceId] = useState("");
   const [mapLayeres, setMapLayers] = useState([]);
 
-  const { user } = useContext(AuthContext);
+  const { user, deviceId } = useContext(AuthContext);
 
   const fetchSurveyData = async () => {
     const response = await fetch(`${BASE_URL}/admin/survey/`, {
@@ -50,18 +55,9 @@ const SurveyMap = () => {
 
   const loadSurveys = async () => {
     const surveyData = await fetchSurveyData();
+    console.log(surveyData);
     setSurveys(surveyData);
   };
-
-  const loadFingerprintJS = async () => {
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    setDeviceId(result.visitorId);
-  };
-
-  useEffect(() => {
-    loadFingerprintJS();
-  }, []);
 
   useEffect(() => {
     if (deviceId) {
@@ -74,7 +70,7 @@ const SurveyMap = () => {
     fetch(`${BASE_URL}/admin/survey/region/`, {
       method: "POST",
       headers: {
-        deviceid: "40b861539ede886c85063ef79ae2e5f1",
+        deviceid: deviceId,
         authorization: `Token ${user.token}`,
         "Content-Type": "application/json",
         "ngrok-skip-browser-warning": "69420",
@@ -85,6 +81,7 @@ const SurveyMap = () => {
       .then((data) => {
         console.log("Surveys within region:", data.surveys);
         setFillterSurvey(data);
+        setNewFillterSurvey(data.surveys);
       })
       .catch((error) => {
         console.error("Error fetching surveys within region:", error);
@@ -225,8 +222,6 @@ const SurveyMap = () => {
             ))}
         </MarkerClusterGroup>
       </MapContainer>
-
-      <SurveyList surveyList={fillterSurvey} />
     </>
   );
 };
