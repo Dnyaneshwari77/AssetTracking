@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import {
@@ -25,6 +25,7 @@ import UserProfile from "../components/UserProfile"; // Import your components
 import EmployeeList from "../components/EmployeeList"; // Import your components
 import AuthContext from "../context/AuthContext";
 import SurveyMap from "../components/SurveyMap";
+import SurveyFilterComponent from "../components/SurveyFilterComponent";
 
 const drawerWidth = 240;
 
@@ -42,10 +43,11 @@ function AdminHomePage() {
   const [open, setOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState("Dashboard");
 
-  if (user == null || role !== "admin") {
-    logout();
-    navigate("/login");
-  }
+  useEffect(() => {
+    if (user == null || role != "admin") {
+      navigate("/login");
+    }
+  }, [user]);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -62,7 +64,7 @@ function AdminHomePage() {
       case "UserProfile":
         return <UserProfile />;
       case "SurveyMap":
-        return <SurveyMap />;
+        return <SurveyFilterComponent />;
       default:
         return <DashboardComponent />;
     }

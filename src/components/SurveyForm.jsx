@@ -25,6 +25,7 @@ export default function SurveyForm() {
   const [deviceId, setDeviceId] = useState("");
   console.log("Location ", location);
 
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,18 +35,23 @@ export default function SurveyForm() {
       setDeviceId(result.visitorId);
     };
     loadFingerprintJS();
+
   }, []);
 
+  console.log("Some random console ");
   const handleFileChange = (event) => {
     setFiles(Array.from(event.target.files));
   };
 
+
+  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true); // Set loading state to true
+    setLoading(true); 
 
     const formData = new FormData();
-
+z
     const data = {
       surveyDescription,
       location,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Container,
   Typography,
@@ -18,63 +18,66 @@ import * as Yup from "yup";
 import axios from "axios";
 import { Cancel } from "@mui/icons-material";
 import { BASE_URL } from "../utils/constant";
+import AuthContext from "../context/AuthContext";
 
 const Input = styled("input")({
   display: "none",
 });
 
-const fetchUserProfile = async () => {
-  try {
-    const response = await axios.get(
-      "http://192.168.150.208:3000/auth/myprofile",
-      {
-        headers: {
-          Authorization:
-            "Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OThhMTBjM2Y4MWNkNDY1ZTU2ZWEwNSIsInVzZXJuYW1lIjoiQWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImRldmljZUlkIjoiNDBiODYxNTM5ZWRlODg2Yzg1MDYzZWY3OWFlMmU1ZjEiLCJpYXQiOjE3MjE3MTA0NDIsImV4cCI6MTcyMjMxNTI0Mn0.cbCQ8IsLsUEI5Wg6EY9VC34BatG_DfhIs2RAVg0dtQc",
-          deviceid: "40b861539ede886c85063ef79ae2e5f1",
-        },
-      }
-    );
-    return response.data.user;
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    throw error;
-  }
-};
-
-const updateUserProfile = async (userData) => {
-  try {
-    const response = await axios.patch(
-      `${BASE_URL}/auth/update/profile`,
-      userData,
-      {
-        headers: {
-          Authorization:
-            "Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OThhMTBjM2Y4MWNkNDY1ZTU2ZWEwNSIsInVzZXJuYW1lIjoiQWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImRldmljZUlkIjoiNDBiODYxNTM5ZWRlODg2Yzg1MDYzZWY3OWFlMmU1ZjEiLCJpYXQiOjE3MjE3MTA0NDIsImV4cCI6MTcyMjMxNTI0Mn0.cbCQ8IsLsUEI5Wg6EY9VC34BatG_DfhIs2RAVg0dtQc",
-          deviceid: "40b861539ede886c85063ef79ae2e5f1",
-        },
-      }
-    );
-    return response.data.agent;
-    console.log("User profile updated successfully");
-  } catch (error) {
-    console.error("Error updating user profile:", error);
-    throw error;
-  }
-};
-
 const UserProfile = () => {
-  const [user, setUser] = useState(null);
+  const [userDatafromAPI, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [profileImage, setProfileImage] = useState("");
+
+  const { user, deviceId } = useContext(AuthContext);
+
+  const updateUserProfile = async (userData) => {
+    try {
+      const response = await axios.patch(
+        `${BASE_URL}/auth/update/profile`,
+        userData,
+        {
+          headers: {
+            Authorization: `
+              Token ${user.token}`,
+            deviceid: deviceId,
+            "ngrok-skip-browser-warning": "69420",
+          },
+        }
+      );
+      console.log("User profile updated successfully");
+      return response.data.agent;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      throw error;
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/auth/myprofile`, {
+        headers: {
+          Authorization: `Token ${user.token}`,
+          deviceid: deviceId,
+          "ngrok-skip-browser-warning": "69420",
+        },
+      });
+
+      console.log(response.data.user);
+      return response.data.user;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     const getUserProfile = async () => {
       try {
         const userData = await fetchUserProfile();
         setUser(userData);
-        console.log("User", user);
-        setProfileImage(userData.profileImage || "");
+        console.log("User", userDatafromAPI);
+        // setProfileImage(userData.profileImage || "");
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
       }
@@ -85,16 +88,16 @@ const UserProfile = () => {
 
   const formik = useFormik({
     initialValues: {
-      username: user?.username || "",
-      employeeID: user?.employeeID || "",
-      email: user?.email || "",
-      resignation: user?.resignation || "",
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      middleName: user?.middleName || "",
-      phone: user?.phone || "",
-      address: user?.address || "",
-      office: user?.office || "",
+      username: userDatafromAPI?.username || "",
+      employeeID: userDatafromAPI?.employeeID || "",
+      email: userDatafromAPI?.email || "",
+      resignation: userDatafromAPI?.resignation || "",
+      firstName: userDatafromAPI?.firstName || "",
+      lastName: userDatafromAPI?.lastName || "",
+      middleName: userDatafromAPI?.middleName || "",
+      phone: userDatafromAPI?.phone || "",
+      address: userDatafromAPI?.address || "",
+      office: userDatafromAPI?.office || "",
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
@@ -145,7 +148,7 @@ const UserProfile = () => {
     }
   };
 
-  if (!user) {
+  if (!userDatafromAPI) {
     return <CircularProgress />;
   }
 
@@ -178,7 +181,7 @@ const UserProfile = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={8}>
             <Typography variant="h4" gutterBottom>
-              {user.username}
+              {userDatafromAPI.username}
             </Typography>
             {editMode ? (
               <form onSubmit={formik.handleSubmit}>
@@ -323,28 +326,28 @@ const UserProfile = () => {
             ) : (
               <>
                 <Typography variant="body1">
-                  <strong>First Name:</strong> {user.firstName}
+                  <strong>First Name:</strong> {userDatafromAPI.firstName}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Last Name:</strong> {user.lastName}
+                  <strong>Last Name:</strong> {userDatafromAPI.lastName}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Middle Name:</strong> {user.middleName}
+                  <strong>Middle Name:</strong> {userDatafromAPI.middleName}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Email:</strong> {user.email}
+                  <strong>Email:</strong> {userDatafromAPI.email}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Phone:</strong> {user.phone}
+                  <strong>Phone:</strong> {userDatafromAPI.phone}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Address:</strong> {user.address}
+                  <strong>Address:</strong> {userDatafromAPI.address}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Office:</strong> {user.office}
+                  <strong>Office:</strong> {userDatafromAPI.office}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Resignation:</strong> {user.resignation}
+                  <strong>Resignation:</strong> {userDatafromAPI.resignation}
                 </Typography>
                 <IconButton onClick={handleEditClick}>
                   <EditIcon />
